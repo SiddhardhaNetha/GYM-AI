@@ -223,9 +223,9 @@ window.calculateBMI = function() {
     let heightInMeters = 0;
 
     if (!age || age <= 0) {
-        resultDiv.style.display = 'block';
         resultDiv.style.background = 'rgba(255, 68, 68, 0.1)';
         resultDiv.style.color = '#ff4444';
+        resultDiv.style.borderStyle = 'solid';
         resultDiv.innerText = 'Please enter a valid age.';
         return;
     }
@@ -247,9 +247,9 @@ window.calculateBMI = function() {
     }
 
     if (!weight || !heightInMeters || weight <= 0 || heightInMeters <= 0) {
-        resultDiv.style.display = 'block';
         resultDiv.style.background = 'rgba(255, 68, 68, 0.1)';
         resultDiv.style.color = '#ff4444';
+        resultDiv.style.borderStyle = 'solid';
         resultDiv.innerText = 'Please enter valid weight and height.';
         return;
     }
@@ -280,12 +280,20 @@ window.calculateBMI = function() {
         else { category = 'Obese'; color = '#ff4444'; }
     }
 
-    resultDiv.style.display = 'block';
     resultDiv.style.background = color + '22';
     resultDiv.style.color = color;
+    resultDiv.style.borderStyle = 'solid';
     resultDiv.innerHTML = `BMI: <strong>${bmi} kg/m²</strong><br><small>${category} (${gender}, ${age}y)</small>`;
 };
 
+
+window.toggleHipInput = function() {
+    const gender = document.getElementById('tdee-gender').value;
+    const hipGroup = document.getElementById('hip-group');
+    if (hipGroup) {
+        hipGroup.style.display = (gender === 'female') ? 'block' : 'none';
+    }
+};
 
 window.calculateTDEE = function() {
     const gender = document.getElementById('tdee-gender').value;
@@ -296,8 +304,8 @@ window.calculateTDEE = function() {
     const resultDiv = document.getElementById('tdee-result');
 
     if (!age || !weight || !height) {
-        resultDiv.style.display = 'block';
         resultDiv.style.color = '#ff4444';
+        resultDiv.style.borderStyle = 'solid';
         resultDiv.innerText = 'Please fill all fields.';
         return;
     }
@@ -308,62 +316,39 @@ window.calculateTDEE = function() {
     
     const tdee = Math.round(bmr * activity);
     
-    resultDiv.style.display = 'block';
     resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
     resultDiv.style.color = '#00ff88';
-    resultDiv.innerHTML = `
-        <strong>BMR:</strong> ${bmr.toFixed(0)} kcal<br>
-        <strong>TDEE:</strong> ${tdee} kcal<br><br>
-        <strong>Daily Goals:</strong><br>
-        • Lose (0.5kg/wk): ${tdee - 500} kcal<br>
-        • Maintain: ${tdee} kcal<br>
-        • Gain (0.5kg/wk): ${tdee + 500} kcal
-    `;
+    resultDiv.style.borderStyle = 'solid';
+    resultDiv.innerHTML = `Maintenance: <strong>${tdee} kcal/day</strong><br><small>${gender}, ${age}y, ${activity === 1.2 ? 'Sedentary' : 'Active'}</small>`;
 };
 
 window.calculatePhysique = function() {
-    const weight = parseFloat(document.getElementById('tdee-weight').value); // Reuse weight from TDEE
-    const height = parseFloat(document.getElementById('tdee-height').value); // Reuse height
+    const gender = document.getElementById('tdee-gender').value;
     const waist = parseFloat(document.getElementById('bf-waist').value);
     const neck = parseFloat(document.getElementById('bf-neck').value);
-    const gender = document.getElementById('tdee-gender').value;
+    const height = parseFloat(document.getElementById('tdee-height').value) || parseFloat(document.getElementById('bmi-height').value);
+    const hip = parseFloat(document.getElementById('bf-hip').value) || 0;
     const resultDiv = document.getElementById('physique-result');
 
-    if (!waist || !neck || !weight || !height) {
-        resultDiv.style.display = 'block';
+    if (!waist || !neck || !height) {
         resultDiv.style.color = '#ff4444';
-        resultDiv.innerText = 'Enter weight/height above + waist/neck.';
+        resultDiv.style.borderStyle = 'solid';
+        resultDiv.innerText = 'Please fill weight/height/neck/waist.';
         return;
     }
 
-    // Ideal Weight (Devine Formula)
-    let idealWeight = 0;
-    const heightInInches = height / 2.54;
+    let bf = 0;
     if (gender === 'male') {
-        idealWeight = 50 + 2.3 * (heightInInches - 60);
+        bf = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
     } else {
-        idealWeight = 45.5 + 2.3 * (heightInInches - 60);
+        bf = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
     }
 
-    // US Navy Body Fat Formula (simplified for metric)
-    let bodyFat = 0;
-    if (gender === 'male') {
-        bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
-    } else {
-        const hip = parseFloat(document.getElementById('bf-hip').value) || waist;
-        bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
-    }
-
-    resultDiv.style.display = 'block';
     resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
     resultDiv.style.color = '#00ff88';
-    resultDiv.innerHTML = `
-        <strong>Body Fat:</strong> ${bodyFat.toFixed(1)}%<br>
-        <strong>Ideal Weight:</strong> ${idealWeight.toFixed(1)} kg<br>
-        <small>Target Range: ${(idealWeight - 5).toFixed(1)} - ${(idealWeight + 5).toFixed(1)} kg</small>
-    `;
+    resultDiv.style.borderStyle = 'solid';
+    resultDiv.innerHTML = `Body Fat: <strong>${bf.toFixed(1)}%</strong>`;
 };
-
 
 window.scrollToCalculator = function(id) {
     const el = document.getElementById(id);

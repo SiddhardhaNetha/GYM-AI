@@ -540,7 +540,13 @@
       border-radius: 6px;
       font-weight: 500;
       text-align: center;
-      display: none;
+      min-height: 54px; /* Matches 2 lines of text approx */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.03); /* Always has a subtle background */
+      border: 1px dashed rgba(255, 255, 255, 0.1);
     }
 
     .feature-card h3 {
@@ -1071,7 +1077,7 @@
       <div class="menu-links">
         <a href="index.html"><span>🏠</span> Home</a>
         <a href="about.html"><span>ℹ️</span> About Us</a>
-        <a href="#"><span>🛡️</span> Privacy Policy</a>
+        <a href="privacy.html"><span>🛡️</span> Privacy Policy</a>
       </div>
     </div>
 
@@ -1183,6 +1189,13 @@
           <h3>💬 Easy to Use</h3>
           <p>Simply ask questions and get instant, actionable fitness advice.</p>
         </div>
+      </div>
+    </div>
+
+    <!-- Calculators Section -->
+    <div class="section">
+      <h2>Calculators</h2>
+      <div class="features">
         <div class="feature-card bmi-calculator">
           <h3>⚖️ BMI Calculator</h3>
           <div class="bmi-inputs">
@@ -1215,7 +1228,52 @@
             </div>
             <button onclick="calculateBMI()" class="btn">Calculate</button>
           </div>
-          <div id="bmi-result" class="bmi-result"></div>
+          <div id="bmi-result" class="bmi-result">Enter details above to see result</div>
+        </div>
+
+        <!-- TDEE Calculator Card -->
+        <div class="feature-card tdee-calculator">
+          <h3>🔥 Calorie/TDEE Calculator</h3>
+          <div class="bmi-inputs">
+            <div class="input-group">
+              <input type="number" id="tdee-age" placeholder="Age" min="1" max="120">
+              <select id="tdee-gender" onchange="toggleHipInput()">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <input type="number" id="tdee-weight" placeholder="Weight (kg)" step="0.1">
+              <input type="number" id="tdee-height" placeholder="Height (cm)" step="1">
+            </div>
+            <div class="input-group">
+              <select id="tdee-activity" style="width: 100%;">
+                <option value="1.2">Sedentary (office job)</option>
+                <option value="1.375">Lightly Active (1-2 days/week)</option>
+                <option value="1.55">Moderate (3-5 days/week)</option>
+                <option value="1.725">Very Active (6-7 days/week)</option>
+                <option value="1.9">Extra Active (Athlete/Physical job)</option>
+              </select>
+            </div>
+            <button onclick="calculateTDEE()" class="btn">Calculate TDEE</button>
+          </div>
+          <div id="tdee-result" class="bmi-result">Enter details above to see result</div>
+        </div>
+
+        <!-- Body Fat Calculator Card -->
+        <div class="feature-card bf-calculator">
+          <h3>📏 Body Fat & Ideal Weight</h3>
+          <div class="bmi-inputs">
+            <div class="input-group">
+              <input type="number" id="bf-waist" placeholder="Waist (cm)" step="0.1">
+              <input type="number" id="bf-neck" placeholder="Neck (cm)" step="0.1">
+            </div>
+            <div class="input-group" id="hip-group" style="display: none;">
+              <input type="number" id="bf-hip" placeholder="Hip (cm)" step="0.1">
+            </div>
+            <button onclick="calculatePhysique()" class="btn">Calculate Body Fat</button>
+          </div>
+          <div id="physique-result" class="bmi-result">Enter details above to see result</div>
         </div>
       </div>
     </div>
@@ -1375,7 +1433,7 @@
       Get expert coaching and guidance 24/7.
     </p>
     <div class="footer-links">
-      <a href="#">Privacy Policy</a>
+      <a href="privacy.html">Privacy Policy</a>
       <a href="#">Terms of Service</a>
       <a href="#">Cookie Policy</a>
       <a href="#">Refund Policy</a>
@@ -1386,7 +1444,7 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script src="./script.js"></script>
 
 </body>
 </html>
