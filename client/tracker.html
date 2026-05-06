@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress Tracking - Gym AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *::-webkit-scrollbar { display: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -ms-overflow-style: none; scrollbar-width: none; }
+    body { background-color: #212121; color: #ececec; line-height: 1.6; overflow-x: hidden; }
+
+    /* Main Header Styling */
+    .main-header {
+      width: 100%;
+      height: 72px; /* Fixed height to prevent layout shift */
+      padding: 0 24px;
+      background: #212121;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .menu-trigger {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .menu-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header-logo {
+      grid-column: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .header-logo h1 {
+      font-size: 1.5em;
+      white-space: nowrap;
+    }
+
+    .header-nav {
+      grid-column: 3;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-link {
+        color: #b4b4b4;
+        text-decoration: none;
+        font-size: 0.9em;
+        font-weight: 500;
+        transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      padding: 10px 0; /* Creates an invisible bridge */
+      margin: -10px 0;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+      z-index: 1001;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 0;
+      top: 100%; /* Position relative to the parent padding */
+    }
+
+    .dropdown-content a {
+      color: #b4b4b4;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85em;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+      padding-left: 20px;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .login-nav-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff !important;
+      margin-left: 10px;
+    }
+
+    .signup-nav-btn {
+      background: #fff;
+      border: 1px solid #fff;
+      color: #000 !important;
+    }
+
+    /* Side Menu Styling */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: #1a1a1a;
+      z-index: 2000;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      padding: 32px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      text-align: left; /* Ensure menu text matches home page */
+    }
+
+    .side-menu.active {
+      transform: translateX(320px);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: #8e8e8e;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .menu-section h3 {
+      font-size: 0.75em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-links a {
+      color: #ececec;
+      text-decoration: none;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .container { padding: 80px 40px; max-width: 1200px; margin: 0 auto; text-align: center; }
+    .feature-placeholder { background: #2f2f2f; padding: 64px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+    .icon { font-size: 4em; margin-bottom: 24px; display: block; }
+    .back-btn { display: inline-block; margin-top: 32px; padding: 12px 24px; background: #fff; color: #000; text-decoration: none; border-radius: 8px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <span style="font-weight: 700; color: #fff;">💪 GYM AI MENU</span>
+      <button class="close-menu" id="closeMenu">✕</button>
+    </div>
+    
+    <div class="menu-section">
+      <h3>Main Features</h3>
+      <div class="menu-links">
+        <a href="nutrition.html"><span>🍎</span> Nutrition Plans</a>
+        <a href="tracker.html"><span>📈</span> Progress Tracker</a>
+        <a href="analysis.html"><span>📊</span> Form Analysis</a>
+        <a href="coaching.html"><span>⚡</span> AI Coaching</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Company</h3>
+      <div class="menu-links">
+        <a href="index.html"><span>🏠</span> Home</a>
+        <a href="about.html"><span>ℹ️</span> About Us</a>
+        <a href="#"><span>🛡️</span> Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Community</h3>
+      <div class="menu-links">
+        <a href="#"><span>👥</span> Members Forum</a>
+        <a href="#"><span>🏆</span> Leaderboard</a>
+        <a href="#"><span>📰</span> Fitness Blog</a>
+      </div>
+    </div>
+
+    <div class="menu-section" style="margin-top: auto;">
+      <div class="menu-links">
+        <a href="#"><span>⚙️</span> Settings</a>
+        <a href="/auth/logout"><span>🚪</span> Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="menu-trigger">
+      <button class="menu-btn" id="menuBtn">
+        <span>☰</span> Menu
+      </button>
+    </div>
+    <div class="header-logo">
+      <h1>💪 Gym AI</h1>
+    </div>
+    <nav class="header-nav" id="header-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <div class="dropdown">
+        <a href="#" class="nav-link" style="color: #fff;">Features ▾</a>
+        <div class="dropdown-content">
+          <a href="nutrition.html">🍎 Nutrition Plans</a>
+          <a href="tracker.html" style="background: rgba(255,255,255,0.05); color: #fff;">📈 Progress Tracker</a>
+          <a href="analysis.html">📊 Form Analysis</a>
+          <a href="coaching.html">⚡ AI Coaching</a>
+        </div>
+      </div>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="coaching.html" class="nav-link">Coaching</a>
+      <a href="/auth/google" class="nav-link login-nav-btn nav-btn" id="login-btn">Log in</a>
+      <a href="/auth/google" class="nav-link signup-nav-btn nav-btn" id="signup-btn">Sign up</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="feature-placeholder">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+        <span class="icon" style="font-size: 2.5em;">📈</span>
+        <h2 style="font-size: 2em; letter-spacing: -0.5px;">Progress Tracking</h2>
+      </div>
+      <p style="margin-top: 8px; color: #8e8e8e; max-width: 500px; margin-left: auto; margin-right: auto;">Log your stats and get an professional AI strength analysis with personalized growth milestones.</p>
+      
+      <div style="margin-top: 40px; display: grid; gap: 24px; max-width: 500px; margin-left: auto; margin-right: auto; text-align: left; background: rgba(255,255,255,0.02); padding: 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 24px rgba(0,0,0,0.2);">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="display: block; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8e8e8e; margin-bottom: 8px;">Body Weight (kg)</label>
+            <input type="number" id="track-weight" placeholder="e.g. 75" style="width: 100%; padding: 14px; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-size: 0.9em; outline: none; transition: border 0.3s;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8e8e8e; margin-bottom: 8px;">Bench Press (kg)</label>
+            <input type="number" id="track-bench" placeholder="e.g. 100" style="width: 100%; padding: 14px; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-size: 0.9em; outline: none; transition: border 0.3s;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="display: block; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8e8e8e; margin-bottom: 8px;">Squat (kg)</label>
+            <input type="number" id="track-squat" placeholder="e.g. 120" style="width: 100%; padding: 14px; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-size: 0.9em; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8e8e8e; margin-bottom: 8px;">Deadlift (kg)</label>
+            <input type="number" id="track-deadlift" placeholder="e.g. 140" style="width: 100%; padding: 14px; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-size: 0.9em; outline: none;">
+          </div>
+        </div>
+        <button id="analyze-progress" class="back-btn" style="margin-top: 8px; background: #fff; color: #000; width: 100%; height: 50px; border-radius: 8px; font-weight: 700; font-size: 1em; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 15px rgba(255,255,255,0.1);">
+          📈 Generate Insights
+        </button>
+      </div>
+
+      <div id="track-result" style="margin-top: 40px; text-align: left; display: none;">
+        <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.2em; display: flex; align-items: center; gap: 10px;">
+          <span>🎯</span> Strength Analysis Report
+        </h3>
+        <div id="track-text" style="background: rgba(255,255,255,0.03); padding: 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); white-space: pre-line; line-height: 1.7; color: #ececec; font-size: 0.95em;">
+        </div>
+      </div>
+      
+      <a href="index.html" class="back-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #fff; margin-top: 40px;">Back to Home</a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('analyze-progress').addEventListener('click', async () => {
+        const weight = document.getElementById('track-weight').value;
+        const bench = document.getElementById('track-bench').value;
+        const squat = document.getElementById('track-squat').value;
+        const deadlift = document.getElementById('track-deadlift').value;
+        const btn = document.getElementById('analyze-progress');
+        const res = document.getElementById('track-result');
+        const textArea = document.getElementById('track-text');
+
+        if(!weight || !bench || !squat || !deadlift) {
+            return alert("Please enter all your metrics (Weight, Bench, Squat, and Deadlift) for a complete analysis!");
+        }
+
+        btn.innerHTML = "<span>⏳</span> Analyzing Biometrics...";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+
+        try {
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `Act as a professional Strength & Conditioning Coach.
+                    The user has provided the following current stats:
+                    - Body Weight: ${weight}kg
+                    - Bench Press: ${bench}kg
+                    - Squat: ${squat}kg
+                    - Deadlift: ${deadlift}kg
+
+                    Please provide a high-end analysis report including:
+                    1. 🏋️ **STRENGTH RATIOS**: Analyze their key lifts relative to bodyweight (e.g., Bench to Weight ratio). 
+                    2. 🏆 **STRENGTH CLASSIFICATION**: Determine if they are Beginner, Intermediate, or Advanced for each lift.
+                    3. 📈 **MILESTONES**: Set 3 specific weight goals for their next 6 months of training.
+                    4. 🔥 **COACH'S TIP**: One professional insight to help them break through their current plateau.
+
+                    Format the output with professional headers, use bullet points (•), and include motivating emojis. Use <strong> and <br> for styling.`
+                })
+            });
+            const data = await response.json();
+            
+            if (data.reply) {
+                res.style.display = "block";
+                const formattedReply = data.reply
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/### (.*?)\n/g, '<h4 style="color: #fff; margin-top: 16px;">$1</h4>')
+                    .replace(/• /g, '<span style="color: #fff; margin-right: 8px;">•</span>')
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>');
+                
+                textArea.innerHTML = formattedReply;
+                btn.innerHTML = "📈 Recalculate Stats";
+                res.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (err) {
+            console.error(err);
+            btn.innerHTML = "❌ Error analyzing";
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    });
+  </script>
+</body>
+</html>

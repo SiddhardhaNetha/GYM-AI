@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Gym AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Hide scrollbars for all elements */
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Reusing the exact same theme and styles from index.html */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #212121;
+      color: #ececec;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .main-header {
+      width: 100%;
+      height: 72px; /* 8px rule */
+      padding: 0 24px;
+      background: #212121;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .menu-trigger {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .menu-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Side Menu Styling */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: #1a1a1a;
+      z-index: 2000;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      padding: 32px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .side-menu.active {
+      transform: translateX(320px);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: #8e8e8e;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .menu-section h3 {
+      font-size: 0.75em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-links a {
+      color: #ececec;
+      text-decoration: none;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-links a:hover {
+      color: #fff;
+      padding-left: 8px;
+    }
+
+    .menu-links a span {
+      font-size: 1.2em;
+    }
+
+    .header-logo {
+      grid-column: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px; /* 8px rule */
+    }
+
+    .header-nav {
+      grid-column: 3;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 24px; /* 3*8px */
+    }
+
+    .nav-link {
+        color: #b4b4b4;
+        text-decoration: none;
+        font-size: 0.9em;
+        font-weight: 500;
+        transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      padding: 10px 0; /* Creates an invisible bridge */
+      margin: -10px 0;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+      z-index: 1001;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 0;
+      top: 100%; /* Position relative to the parent padding */
+    }
+
+    .dropdown-content a {
+      color: #b4b4b4;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85em;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+      padding-left: 20px;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .login-nav-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff !important;
+      margin-left: 10px;
+    }
+
+    .signup-nav-btn {
+      background: #fff;
+      border: 1px solid #fff;
+      color: #000 !important;
+    }
+
+    .container {
+      display: block;
+      min-height: calc(100vh - 120px);
+      padding: 80px 40px; /* 10*8px */
+      max-width: 1200px; /* Increased to resolve congestion */
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: 64px; /* 8*8px */
+    }
+
+    .section h2 {
+      font-size: 1.75em;
+      margin-bottom: 24px; /* 3*8px */
+      color: #fff;
+    }
+
+    .section p {
+      margin-bottom: 16px; /* 2*8px */
+      color: #b4b4b4;
+      font-size: 1.05em;
+      line-height: 1.8;
+    }
+
+    .mission-box {
+      background: #2f2f2f;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px; /* 5*8px */
+      border-radius: 12px;
+      margin: 40px 0; /* 5*8px */
+      text-align: center;
+    }
+
+    .mission-box h3 {
+      color: #fff;
+      font-size: 1.5em;
+      margin-bottom: 16px; /* 2*8px */
+    }
+
+    /* Team Section Styles */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; /* 3*8px */
+      margin-top: 32px; /* 4*8px */
+    }
+
+    .team-card {
+      background: #2f2f2f;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 32px; /* 4*8px */
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .team-card:hover {
+      background: #383838;
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .team-card .avatar {
+      width: 80px;
+      height: 80px;
+      background: #3a3a3a;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .team-card h3 {
+      color: #fff;
+      margin-bottom: 4px;
+      font-size: 1.25em;
+    }
+
+    .team-card .role {
+      color: #ff6b35;
+      font-size: 0.85em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .team-card p {
+      margin-top: 12px;
+      font-size: 0.9em;
+      color: #b4b4b4;
+      line-height: 1.6;
+    }
+
+    .main-footer {
+      background: #212121;
+      padding: 60px 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .footer-logo h2 {
+      font-size: 1.25em;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .copyright {
+      color: #8e8e8e;
+      font-size: 0.75em;
+      margin-top: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .header-nav .nav-link:not(.nav-btn) { display: none; }
+      .main-header { display: flex; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Side Menu -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <div class="header-logo">
+        <h2 style="font-size: 1.2em;">💪 Gym AI</h2>
+      </div>
+      <button class="close-menu" id="closeMenu">&times;</button>
+    </div>
+
+    <div class="menu-section">
+      <h3>Main Features</h3>
+      <div class="menu-links">
+        <a href="nutrition.html"><span>🍎</span> Nutrition Plans</a>
+        <a href="tracker.html"><span>📈</span> Progress Tracker</a>
+        <a href="analysis.html"><span>📊</span> Form Analysis</a>
+        <a href="coaching.html"><span>⚡</span> AI Coaching</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Company</h3>
+      <div class="menu-links">
+        <a href="index.html"><span>🏠</span> Home</a>
+        <a href="about.html"><span>ℹ️</span> About Us</a>
+        <a href="#"><span>🛡️</span> Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Community</h3>
+      <div class="menu-links">
+        <a href="#"><span>👥</span> Members Forum</a>
+        <a href="#"><span>🏆</span> Leaderboard</a>
+        <a href="#"><span>📰</span> Fitness Blog</a>
+      </div>
+    </div>
+
+    <div class="menu-section" style="margin-top: auto;">
+      <div class="menu-links">
+        <a href="#"><span>⚙️</span> Settings</a>
+        <a href="/auth/logout"><span>🚪</span> Logout</a>
+      </div>
+    </div>
+  </div>
+
+<header class="main-header">
+  <div class="menu-trigger">
+    <button class="menu-btn" id="menuBtn">
+      <span>☰</span> Menu
+    </button>
+  </div>
+  <div class="header-logo">
+    <h1>💪 Gym AI</h1>
+  </div>
+  <nav class="header-nav" id="header-nav">
+    <a href="index.html" class="nav-link">Home</a>
+    <div class="dropdown">
+      <a href="#" class="nav-link">Features ▾</a>
+      <div class="dropdown-content">
+        <a href="nutrition.html">🍎 Nutrition Plans</a>
+        <a href="tracker.html">📈 Progress Tracker</a>
+        <a href="analysis.html">📊 Form Analysis</a>
+        <a href="coaching.html">⚡ AI Coaching</a>
+      </div>
+    </div>
+    <a href="about.html" class="nav-link" style="color: #fff;">About</a>
+    <a href="coaching.html" class="nav-link">Coaching</a>
+    <a href="/auth/google" class="nav-link login-nav-btn nav-btn">Log in</a>
+    <a href="/auth/google" class="nav-link signup-nav-btn nav-btn">Sign up</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="section">
+    <h2>Our Vision</h2>
+    <p>
+      At Gym AI, we believe that elite fitness coaching should be accessible to everyone, everywhere. Founded by a team of sports scientists and AI researchers, our goal was to bridge the gap between expensive personal trainers and unguided solo workouts.
+    </p>
+    
+    <div class="mission-box">
+      <h3>The Mission</h3>
+      <p style="margin-bottom: 0;">To empower 1 billion people to achieve their physical peak through the synergy of human science and artificial intelligence.</p>
+    </div>
+
+    <h2>Who We Are</h2>
+    <p>
+      We aren't just a software company; we are fitness enthusiasts. Our algorithms are trained on thousands of certified exercise protocols, nutritional studies, and real-world results. This ensures that every piece of advice you receive is grounded in physiological truth.
+    </p>
+
+    <h2>The Technology</h2>
+    <p>
+      Utilizing advanced Large Language Models and Computer Vision, Gym AI analyzes your inputs, understands your unique biomechanics, and adapts to your progress in real-time. Whether you're training in a world-class gym or your living room, the experience is seamless.
+    </p>
+
+    <h2>Meet the Team</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="avatar">👨‍💻</div>
+        <h3>Sai Siddhardha</h3>
+        <div class="role">Founder</div>
+        <p>A visionary developer and fitness enthusiast dedicated to pushing the boundaries of AI-integrated wellness and personalized coaching.</p>
+      </div>
+      <div class="team-card">
+        <div class="avatar">🚀</div>
+        <h3>Akash</h3>
+        <div class="role">Ex-Founder</div>
+        <p>A strategic innovator whose foundational expertise in startup growth and fitness technology helped pave the way for the Gym AI platform.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="main-footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <h2>💪 Gym AI</h2>
+    </div>
+    <div class="copyright">
+      <p>© 2026 Gym AI. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

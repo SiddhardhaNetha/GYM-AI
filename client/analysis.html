@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Analysis - Gym AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *::-webkit-scrollbar { display: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -ms-overflow-style: none; scrollbar-width: none; }
+    body { background-color: #212121; color: #ececec; line-height: 1.6; overflow-x: hidden; }
+
+    /* Main Header Styling */
+    .main-header {
+      width: 100%;
+      height: 72px; /* Fixed height to prevent layout shift (72 = 9*8) */
+      padding: 0 24px;
+      background: #212121;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .menu-trigger {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .menu-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header-logo {
+      grid-column: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .header-logo h1 {
+      font-size: 1.5em;
+      white-space: nowrap;
+    }
+
+    .header-nav {
+      grid-column: 3;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-link {
+        color: #b4b4b4;
+        text-decoration: none;
+        font-size: 0.9em;
+        font-weight: 500;
+        transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      padding: 10px 0; /* Creates an invisible bridge */
+      margin: -10px 0;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+      z-index: 1001;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 0;
+      top: 100%; /* Position relative to the parent padding */
+    }
+
+    .dropdown-content a {
+      color: #b4b4b4;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85em;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+      padding-left: 20px;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .login-nav-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff !important;
+      margin-left: 10px;
+    }
+
+    .signup-nav-btn {
+      background: #fff;
+      border: 1px solid #fff;
+      color: #000 !important;
+    }
+
+    /* Side Menu Styling */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: #1a1a1a;
+      z-index: 2000;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      padding: 32px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      text-align: left; /* Ensure menu text matches home page */
+    }
+
+    .side-menu.active {
+      transform: translateX(320px);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: #8e8e8e;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .menu-section h3 {
+      font-size: 0.75em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-links a {
+      color: #ececec;
+      text-decoration: none;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .container { padding: 80px 40px; max-width: 1200px; margin: 0 auto; text-align: center; }
+    .feature-placeholder { background: #2f2f2f; padding: 64px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+    .icon { font-size: 4em; margin-bottom: 24px; display: block; }
+    .back-btn { display: inline-block; margin-top: 32px; padding: 12px 24px; background: #fff; color: #000; text-decoration: none; border-radius: 8px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <span style="font-weight: 700; color: #fff;">💪 GYM AI MENU</span>
+      <button class="close-menu" id="closeMenu">✕</button>
+    </div>
+    
+    <div class="menu-section">
+      <h3>Main Features</h3>
+      <div class="menu-links">
+        <a href="nutrition.html"><span>🍎</span> Nutrition Plans</a>
+        <a href="tracker.html"><span>📈</span> Progress Tracker</a>
+        <a href="analysis.html"><span>📊</span> Form Analysis</a>
+        <a href="coaching.html"><span>⚡</span> AI Coaching</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Company</h3>
+      <div class="menu-links">
+        <a href="index.html"><span>🏠</span> Home</a>
+        <a href="about.html"><span>ℹ️</span> About Us</a>
+        <a href="#"><span>🛡️</span> Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Community</h3>
+      <div class="menu-links">
+        <a href="#"><span>👥</span> Members Forum</a>
+        <a href="#"><span>🏆</span> Leaderboard</a>
+        <a href="#"><span>📰</span> Fitness Blog</a>
+      </div>
+    </div>
+
+    <div class="menu-section" style="margin-top: auto;">
+      <div class="menu-links">
+        <a href="#"><span>⚙️</span> Settings</a>
+        <a href="/auth/logout"><span>🚪</span> Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="menu-trigger">
+      <button class="menu-btn" id="menuBtn">
+        <span>☰</span> Menu
+      </button>
+    </div>
+    <div class="header-logo">
+      <h1>💪 Gym AI</h1>
+    </div>
+    <nav class="header-nav" id="header-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <div class="dropdown">
+        <a href="#" class="nav-link" style="color: #fff;">Features ▾</a>
+        <div class="dropdown-content">
+          <a href="nutrition.html">🍎 Nutrition Plans</a>
+          <a href="tracker.html">📈 Progress Tracker</a>
+          <a href="analysis.html" style="background: rgba(255,255,255,0.05); color: #fff;">📊 Form Analysis</a>
+          <a href="coaching.html">⚡ AI Coaching</a>
+        </div>
+      </div>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="coaching.html" class="nav-link">Coaching</a>
+      <a href="/auth/google" class="nav-link login-nav-btn nav-btn" id="login-btn">Log in</a>
+      <a href="/auth/google" class="nav-link signup-nav-btn nav-btn" id="signup-btn">Sign up</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="feature-placeholder">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+        <span class="icon" style="font-size: 2.5em;">📊</span>
+        <h2 style="font-size: 2em; letter-spacing: -0.5px;">AI Form Analysis</h2>
+      </div>
+      <p style="margin-top: 8px; color: #8e8e8e; max-width: 500px; margin-left: auto; margin-right: auto;">Upload a workout photo or video frame. Our vision AI will analyze your posture, joint alignment, and range of motion.</p>
+      
+      <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 24px; background: rgba(255,255,255,0.02); padding: 40px; border-radius: 24px; border: 1px dashed rgba(255,255,255,0.1); max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div id="preview-container" style="display: none; width: 100%; max-width: 300px; border-radius: 12px; overflow: hidden; border: 2px solid #fff;">
+          <img id="image-preview" style="width: 100%; display: block;">
+        </div>
+        
+        <input type="file" id="analysis-upload" accept="image/*" style="display: none;">
+        
+        <div style="display: flex; gap: 12px; width: 100%;">
+          <button onclick="document.getElementById('analysis-upload').click()" class="back-btn" style="flex: 1; margin-top: 0; background: #2f2f2f; color: #fff; border: 1px solid rgba(255,255,255,0.2); font-weight: 600;">
+            📁 Select Image
+          </button>
+          <button id="start-analysis" class="back-btn" style="flex: 1; margin-top: 0; background: #fff; color: #000; opacity: 0.5; pointer-events: none; font-weight: 700;">
+            🚀 Run Vision AI
+          </button>
+        </div>
+        
+        <div id="status-display" style="color: #b4b4b4; font-size: 0.85em; font-weight: 500;">Please upload a clear workout photo.</div>
+      </div>
+
+      <div id="result-area" style="margin-top: 40px; text-align: left; display: none;">
+        <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.25em; display: flex; align-items: center; gap: 12px;">
+          <span>📋</span> Technical Form Report
+        </h3>
+        <div id="analysis-text" style="background: rgba(255,255,255,0.03); padding: 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); line-height: 1.8; color: #ececec; font-size: 1em;">
+        </div>
+      </div>
+      
+      <a href="index.html" class="back-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #8e8e8e; margin-top: 48px; font-size: 0.9em;">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const upload = document.getElementById('analysis-upload');
+        const startBtn = document.getElementById('start-analysis');
+        const status = document.getElementById('status-display');
+        const resultArea = document.getElementById('result-area');
+        const resultText = document.getElementById('analysis-text');
+        const previewImg = document.getElementById('image-preview');
+        const previewContainer = document.getElementById('preview-container');
+
+        let currentFile = null;
+
+        upload.addEventListener('change', (e) => {
+            currentFile = e.target.files[0];
+            if (currentFile) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewImg.src = event.target.result;
+                    previewContainer.style.display = "block";
+                };
+                reader.readAsDataURL(currentFile);
+                
+                status.textContent = `File Ready: ${currentFile.name}`;
+                startBtn.style.opacity = "1";
+                startBtn.style.pointerEvents = "auto";
+            }
+        });
+
+        startBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            
+            startBtn.innerHTML = "⏳ Processing Vision AI...";
+            startBtn.disabled = true;
+            startBtn.style.opacity = "0.7";
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result;
+                try {
+                    const response = await fetch("/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            message: `Act as an expert Biomechanics Specialist and Strength Coach. 
+                            Analyze this exercise image for anatomical form and safety. 
+                            
+                            Please provide:
+                            1. 🔍 **TECHNIQUE OBSERVATIONS**: What are the key joints doing (knees, hips, back, shoulders)?
+                            2. ✅ **STRENGTHS**: What part of the form looks perfect?
+                            3. ⚠️ **CORRECTIONS**: Identify 2-3 specific adjustments to improve safety or efficiency.
+                            4. 🎯 **CUE TO REMEMBER**: One short, powerful mental cue for their next set.
+                            
+                            Professional tone, use motivating emojis, and format with <strong> and <br>.`,
+                            image: base64
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.reply) {
+                        resultArea.style.display = "block";
+                        const formattedReply = data.reply
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/### (.*?)\n/g, '<h4 style="color: #fff; margin-top: 16px;">$1</h4>')
+                            .replace(/\n\n/g, '<br><br>')
+                            .replace(/\n/g, '<br>');
+                            
+                        resultText.innerHTML = formattedReply;
+                        startBtn.innerHTML = "🔄 Analyze Another";
+                        status.textContent = "Analysis Complete!";
+                        resultArea.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "⚠️ Error: Visual AI engine offline.";
+                } finally {
+                    startBtn.disabled = false;
+                    startBtn.style.opacity = "1";
+                }
+            };
+            reader.readAsDataURL(currentFile);
+        });
+    });
+  </script>
+</body>
+</html>

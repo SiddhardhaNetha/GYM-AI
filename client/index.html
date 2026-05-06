@@ -6,6 +6,16 @@
   <title>Gym AI - AI-Powered Fitness Coaching</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Hide scrollbars for all elements */
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -17,12 +27,14 @@
       background-color: #212121;
       color: #ececec;
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
     /* Main Header Styling */
     .main-header {
       width: 100%;
-      padding: 12px 24px;
+      height: 72px; /* Fixed height to prevent layout shift (72 = 9*8) */
+      padding: 0 24px;
       background: #212121;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: grid;
@@ -33,11 +45,131 @@
       z-index: 1000;
     }
 
+    .menu-trigger {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .menu-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Side Menu Styling */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: #1a1a1a;
+      z-index: 2000;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      padding: 32px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .side-menu.active {
+      transform: translateX(320px);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: #8e8e8e;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .menu-section h3 {
+      font-size: 0.75em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-links a {
+      color: #ececec;
+      text-decoration: none;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-links a:hover {
+      color: #fff;
+      padding-left: 8px;
+    }
+
+    .menu-links a span {
+      font-size: 1.2em;
+    }
+
+    .header-logo h1 {
+      font-size: 1.5em; /* Explicitly set to prevent jumping */
+      white-space: nowrap;
+    }
+
     .header-logo {
       grid-column: 2;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px; /* 8px rule */
+      justify-content: center;
     }
 
     .header-nav {
@@ -45,7 +177,7 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      gap: 20px;
+      gap: 24px; /* 3*8px */
     }
 
     .nav-link {
@@ -58,6 +190,46 @@
 
     .nav-link:hover {
         color: #fff;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      padding: 10px 0; /* Creates an invisible bridge */
+      margin: -10px 0;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+      z-index: 1001;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 0;
+      top: 100%; /* Position relative to the parent padding */
+    }
+
+    .dropdown-content a {
+      color: #b4b4b4;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85em;
+      transition: all 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+      padding-left: 20px;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
     }
 
     .nav-btn {
@@ -93,7 +265,7 @@
 
     .main-footer {
       background: #212121;
-      padding: 60px 40px;
+      padding: 64px 40px; /* 8*8px */
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       text-align: center;
     }
@@ -105,7 +277,7 @@
 
     .footer-logo h2 {
       font-size: 1.25em;
-      margin-bottom: 12px;
+      margin-bottom: 16px; /* 2*8px */
       color: #fff;
       -webkit-background-clip: initial;
       -webkit-text-fill-color: initial;
@@ -113,10 +285,10 @@
     }
 
     .footer-links {
-      margin: 24px 0;
+      margin: 24px 0; /* 3*8px */
       display: flex;
       justify-content: center;
-      gap: 24px;
+      gap: 24px; /* 3*8px */
     }
 
     .footer-links a {
@@ -133,21 +305,64 @@
     .copyright {
       color: #8e8e8e;
       font-size: 0.75em;
-      margin-top: 32px;
+      margin-top: 32px; /* 4*8px */
     }
 
     .container {
       display: block;
       min-height: calc(100vh - 120px);
-      padding: 80px 24px;
-      max-width: 800px;
+      padding: 64px 40px 96px 40px; /* 8*8px, 12*8px */
+      max-width: 1200px; /* Increased from 800px to use more screen space */
       margin: 0 auto;
+      clear: both; /* Ensure it starts after floated/transformed elements */
     }
 
     /* Left Content Area */
     .content {
       padding: 0;
-      max-width: 1000px;
+      max-width: 100%; /* Changed from 1000px to allow spreading */
+    }
+
+    /* Scrolling Banner Styling */
+    .scrolling-banner {
+      width: 130%;
+      margin-left: -15%;
+      background: #2f2f2f;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 8px 0; /* 2*8px */
+      position: relative;
+      transform: rotate(-1deg);
+      z-index: 900;
+      margin-top: 16px; /* 2*8px */
+      margin-bottom: 8px; /* 8px rule */
+      min-height: 48px; /* 6*8px */
+    }
+
+    .banner-content {
+      display: inline-block;
+      animation: scrollBanner 30s linear infinite;
+    }
+
+    .banner-item {
+      display: inline-block;
+      padding: 0 40px;
+      color: #fff;
+      font-size: 0.9em;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .banner-item span {
+      color: #ff6b35;
+      margin-right: 10px;
+    }
+
+    @keyframes scrollBanner {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
 
     /* Header */
@@ -207,32 +422,134 @@
     /* Features Grid */
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-      margin-top: 32px;
+      grid-template-columns: repeat(3, 1fr); /* Force 3 columns for better space usage */
+      gap: 24px; /* 3*8px */
+      margin-top: 32px; /* 4*8px */
+    }
+
+    @media (max-width: 900px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .features {
+        grid-template-columns: 1fr;
+      }
     }
 
     .feature-card {
       background: #2f2f2f;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
-      padding: 24px;
-      transition: background 0.2s ease;
+      padding: 24px; /* 3*8px */
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     .feature-card:hover {
       background: #383838;
-      transform: none;
+      transform: translateY(-8px); /* 1*8px */
       border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* BMI Calculator Styles */
+    .feature-card.bmi-calculator:hover {
+      transform: none !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: none !important;
+      cursor: default !important;
+      background: #2f2f2f !important;
+    }
+
+    .bmi-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .input-group select {
+      background: transparent;
+      border: none;
+      color: #00ff88;
+      font-weight: 600;
+      padding: 8px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .input-group select option {
+      background: #2f2f2f;
+      color: white;
+    }
+
+    .input-group input {
+      background: transparent !important;
+      border: none !important;
+      padding: 8px !important;
+      color: white;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+    }
+
+    .bmi-inputs .btn {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    #cm-input-container, #ft-in-input-container {
+      flex: 1;
+    }
+
+    #ft-in-input-container {
+      display: flex;
+      gap: 5px;
+    }
+
+    .bmi-inputs button {
+      background: #00ff88;
+      color: #121212;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .bmi-inputs button:hover {
+      background: #00cc6e;
+    }
+
+    .bmi-result {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
     }
 
     .feature-card h3 {
       color: #fff;
-      margin-bottom: 8px;
+      margin-bottom: 8px; /* 1*8px */
       font-size: 1.1em;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 8px; /* 1*8px */
     }
 
     .feature-card p {
@@ -259,6 +576,84 @@
     .contact-item strong {
       color: #fff;
       min-width: 120px;
+    }
+
+    /* Testimonials Section */
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px; /* 3*8px */
+      margin-top: 40px; /* 5*8px */
+      margin-bottom: 64px; /* 8*8px */
+    }
+
+    .testimonial-card {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px; /* 2*8px */
+      padding: 32px; /* 4*8px */
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-8px); /* 1*8px */
+      background: #252525;
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .testimonial-header {
+      display: flex;
+      align-items: center;
+      gap: 16px; /* 2*8px */
+      margin-bottom: 16px; /* 2*8px */
+    }
+
+    .testimonial-img {
+      width: 64px; /* 8*8px */
+      height: 64px; /* 8*8px */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+    }
+
+    .testimonial-info h4 {
+      color: #fff;
+      font-size: 1.1em;
+      margin-bottom: 0;
+    }
+
+    .testimonial-info p {
+      color: #8e8e8e;
+      font-size: 0.85em;
+      margin: 0;
+    }
+
+    .testimonial-quote {
+      font-style: italic;
+      color: #ececec;
+      line-height: 1.6;
+      font-size: 0.95em;
+      margin: 0;
+    }
+
+    .stars {
+      color: #FFD700;
+      margin-bottom: 8px; /* 1*8px */
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 1024px) {
+      .testimonials {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .testimonials {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Floating Toggle Chatbot Styling */
@@ -481,6 +876,30 @@
         background: #3f3f3f;
     }
 
+    /* Preview Thumbnail Handling */
+    .preview-container {
+      display: none;
+      padding: 0 20px 10px 20px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .image-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .remove-img {
+      color: #ff6b35;
+      cursor: pointer;
+      font-size: 0.8em;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
     .reset-btn {
       display: none;
     }
@@ -627,20 +1046,94 @@
   </style>
 </head>
 <body>
+  <!-- Side Menu -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <div class="header-logo">
+        <h2 style="font-size: 1.2em;">💪 Gym AI</h2>
+      </div>
+      <button class="close-menu" id="closeMenu">&times;</button>
+    </div>
+
+    <div class="menu-section">
+      <h3>Main Features</h3>
+      <div class="menu-links">
+        <a href="nutrition.html"><span>🍎</span> Nutrition Plans</a>
+        <a href="tracker.html"><span>📈</span> Progress Tracker</a>
+        <a href="analysis.html"><span>📊</span> Form Analysis</a>
+        <a href="coaching.html"><span>⚡</span> AI Coaching</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Company</h3>
+      <div class="menu-links">
+        <a href="index.html"><span>🏠</span> Home</a>
+        <a href="about.html"><span>ℹ️</span> About Us</a>
+        <a href="#"><span>🛡️</span> Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <h3>Community</h3>
+      <div class="menu-links">
+        <a href="#"><span>👥</span> Members Forum</a>
+        <a href="#"><span>🏆</span> Leaderboard</a>
+        <a href="#"><span>📰</span> Fitness Blog</a>
+      </div>
+    </div>
+
+    <div class="menu-section" style="margin-top: auto;">
+      <div class="menu-links">
+        <a href="#"><span>⚙️</span> Settings</a>
+        <a href="/auth/logout"><span>🚪</span> Logout</a>
+      </div>
+    </div>
+  </div>
 
 <header class="main-header">
-  <div></div> <!-- Empty spacer for grid -->
+  <div class="menu-trigger">
+    <button class="menu-btn" id="menuBtn">
+      <span>☰</span> Menu
+    </button>
+  </div>
   <div class="header-logo">
     <h1>💪 Gym AI</h1>
   </div>
-  <nav class="header-nav">
-    <a href="#" class="nav-link">Home</a>
-    <a href="#" class="nav-link">About</a>
-    <a href="#" class="nav-link">Coaching</a>
-    <a href="#" class="nav-link login-nav-btn nav-btn">Log in</a>
-    <a href="#" class="nav-link signup-nav-btn nav-btn">Sign up</a>
+  <nav class="header-nav" id="header-nav">
+    <a href="index.html" class="nav-link">Home</a>
+    <div class="dropdown">
+      <a href="#" class="nav-link">Features ▾</a>
+      <div class="dropdown-content">
+        <a href="nutrition.html">🍎 Nutrition Plans</a>
+        <a href="tracker.html">📈 Progress Tracker</a>
+        <a href="analysis.html">📊 Form Analysis</a>
+        <a href="coaching.html">⚡ AI Coaching</a>
+      </div>
+    </div>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="coaching.html" class="nav-link">Coaching</a>
+    <a href="/auth/google" class="nav-link login-nav-btn nav-btn" id="login-btn">Log in</a>
+    <a href="/auth/google" class="nav-link signup-nav-btn nav-btn" id="signup-btn">Sign up</a>
   </nav>
 </header>
+
+<div class="scrolling-banner">
+  <div class="banner-content">
+    <div class="banner-item"><span>NEW:</span> AI Form Analysis now supporting Deadlifts</div>
+    <div class="banner-item"><span>TIPS:</span> Stay hydrated! Drink at least 3L water daily</div>
+    <div class="banner-item"><span>UPDATE:</span> 24/7 Live Coaching now available globally</div>
+    <div class="banner-item"><span>OFFER:</span> Get 20% off on all annual coaching plans</div>
+    <div class="banner-item"><span>NEWS:</span> Join our community of 1M+ fitness enthusiasts</div>
+    <!-- Duplicate for seamless scroll -->
+    <div class="banner-item"><span>NEW:</span> AI Form Analysis now supporting Deadlifts</div>
+    <div class="banner-item"><span>TIPS:</span> Stay hydrated! Drink at least 3L water daily</div>
+    <div class="banner-item"><span>UPDATE:</span> 24/7 Live Coaching now available globally</div>
+    <div class="banner-item"><span>OFFER:</span> Get 20% off on all annual coaching plans</div>
+    <div class="banner-item"><span>NEWS:</span> Join our community of 1M+ fitness enthusiasts</div>
+  </div>
+</div>
 
 <div class="container">
   <!-- Left Content -->
@@ -675,7 +1168,7 @@
           <p>Access to comprehensive fitness, nutrition, and health information.</p>
         </div>
         <div class="feature-card">
-          <h3>⏰24/7 Availability</h3>
+          <h3>⏰ 24/7 Availability</h3>
           <p>Get fitness advice anytime, anywhere. Our AI coach never sleeps.</p>
         </div>
         <div class="feature-card">
@@ -690,6 +1183,40 @@
           <h3>💬 Easy to Use</h3>
           <p>Simply ask questions and get instant, actionable fitness advice.</p>
         </div>
+        <div class="feature-card bmi-calculator">
+          <h3>⚖️ BMI Calculator</h3>
+          <div class="bmi-inputs">
+            <div class="input-group">
+              <input type="number" id="bmi-age" placeholder="Age" min="1" max="120">
+              <select id="bmi-gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <input type="number" id="bmi-weight" placeholder="Weight" step="0.1">
+              <select id="weight-unit">
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <div id="cm-input-container">
+                <input type="number" id="bmi-height" placeholder="Height (cm)" step="1">
+              </div>
+              <div id="ft-in-input-container" style="display: none; width: 100%;">
+                <input type="number" id="bmi-height-ft" placeholder="ft" step="1">
+                <input type="number" id="bmi-height-in" placeholder="in" step="1">
+              </div>
+              <select id="height-unit" onchange="toggleHeightInputs()">
+                <option value="cm">cm</option>
+                <option value="ft-in">ft/in</option>
+              </select>
+            </div>
+            <button onclick="calculateBMI()" class="btn">Calculate</button>
+          </div>
+          <div id="bmi-result" class="bmi-result"></div>
+        </div>
       </div>
     </div>
 
@@ -698,26 +1225,71 @@
       <h2>What We Cover</h2>
       <ul style="list-style: none; margin-top: 20px;">
         <li style="margin-bottom: 15px; padding-left: 30px; position: relative;">
-          <span style="position: absolute; left: 0; color: #ff6b35;">✓</span>
+          <span style="position: absolute; left: 0; color: #ff6b35;">✔️</span>
           <strong>Workout Routines:</strong> Beginner to advanced training programs for all fitness levels
         </li>
         <li style="margin-bottom: 15px; padding-left: 30px; position: relative;">
-          <span style="position: absolute; left: 0; color: #ff6b35;">✓</span>
+          <span style="position: absolute; left: 0; color: #ff6b35;">✔️</span>
           <strong>Nutrition & Diet:</strong> Nutritional guidance to support your fitness goals
         </li>
         <li style="margin-bottom: 15px; padding-left: 30px; position: relative;">
-          <span style="position: absolute; left: 0; color: #ff6b35;">✓</span>
+          <span style="position: absolute; left: 0; color: #ff6b35;">✔️</span>
           <strong>Exercise Techniques:</strong> Proper form and technique for various exercises
         </li>
         <li style="margin-bottom: 15px; padding-left: 30px; position: relative;">
-          <span style="position: absolute; left: 0; color: #ff6b35;">✓</span>
+          <span style="position: absolute; left: 0; color: #ff6b35;">✔️</span>
           <strong>Recovery & Injury Prevention:</strong> Best practices for staying healthy
         </li>
         <li style="margin-bottom: 15px; padding-left: 30px; position: relative;">
-          <span style="position: absolute; left: 0; color: #ff6b35;">✓</span>
+          <span style="position: absolute; left: 0; color: #ff6b35;">✔️</span>
           <strong>Motivation & Mindset:</strong> Tips for staying consistent with your fitness journey
         </li>
       </ul>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="section">
+      <h2>Success Stories</h2>
+      <div class="testimonials">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop" alt="Sarah Johnson" class="testimonial-img">
+            <div class="testimonial-info">
+              <h4>Sarah Johnson</h4>
+              <p>Lost 15kg in 4 months</p>
+            </div>
+          </div>
+          <p class="testimonial-quote">"Gym AI changed my life. Having a coach in my pocket 24/7 meant I never skipped a workout. The nutritional advice was spot on!"</p>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop" alt="David Chen" class="testimonial-img">
+            <div class="testimonial-info">
+              <h4>David Chen</h4>
+              <p>Muscle Mass Gain: +8kg</p>
+            </div>
+          </div>
+          <p class="testimonial-quote">"As a busy professional, I needed efficiency. The AI created a high-intensity routine that fit my 45-minute lunch breaks. Incredible results."</p>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1548690312-e3b507d17a4d?q=80&w=1974&auto=format&fit=crop" alt="Maya Rodriguez" class="testimonial-img">
+            <div class="testimonial-info">
+              <h4>Maya Rodriguez</h4>
+              <p>Fitness Enthusiast</p>
+            </div>
+          </div>
+          <p class="testimonial-quote">"The form analysis feature is a game-changer. I corrected my squat posture within days and finally reached my PR of 100kg safely!"</p>
+        </div>
+      </div>
     </div>
 
     <!-- Contact Section -->
@@ -765,15 +1337,22 @@
         <!-- Messages will appear here -->
       </div>
 
+      <!-- Image Preview Area -->
+      <div id="preview-container" class="preview-container">
+        <img id="image-preview" class="image-preview" src="" alt="Preview">
+        <span class="remove-img" onclick="clearImage()">Remove</span>
+      </div>
+
       <div class="input-wrapper">
         <div class="input-group">
-          <button class="add-btn" id="add-btn" title="Add pictures or documents">+</button>
+          <input type="file" id="file-input" accept="image/*" style="display: none;">
+          <button class="add-btn" id="add-btn" onclick="document.getElementById('file-input').click()" title="Add picture">+</button>
           <input 
             id="input" 
             type="text" 
             placeholder="Ask anything"
             autocomplete="off"
-            oninput="handleInput(this)"
+            oninput="window.handleInput(this)"
           />
         </div>
       </div>
@@ -781,7 +1360,7 @@
   </div>
 
   <!-- Chat Toggle Button -->
-  <div class="chat-toggle" id="chat-toggle" onclick="toggleChat()">
+  <div class="chat-toggle" id="chat-toggle" onclick="window.toggleChat()">
     💬
   </div>
 </div>
