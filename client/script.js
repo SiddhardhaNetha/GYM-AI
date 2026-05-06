@@ -194,17 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (closeMenu) closeMenu.addEventListener("click", hideMenu);
         menuOverlay.addEventListener("click", hideMenu);
     }
-
-    // Mobile Hamburger Toggle
-    const mobileToggle = document.getElementById("mobileMenuToggle");
-    if (mobileToggle) {
-        mobileToggle.addEventListener("click", () => {
-            if (sideMenu && menuOverlay) {
-                sideMenu.classList.add("active");
-                menuOverlay.classList.add("active");
-            }
-        });
-    }
 });
 
 window.toggleHeightInputs = function() {
