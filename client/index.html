@@ -325,8 +325,7 @@
 
     /* Scrolling Banner Styling */
     .scrolling-banner {
-      width: 130%;
-      margin-left: -15%;
+      width: 100%;
       background: #2f2f2f;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -334,7 +333,6 @@
       white-space: nowrap;
       padding: 8px 0; /* 2*8px */
       position: relative;
-      transform: rotate(-1deg);
       z-index: 900;
       margin-top: 16px; /* 2*8px */
       margin-bottom: 8px; /* 8px rule */
@@ -455,7 +453,9 @@
     }
 
     /* BMI Calculator Styles */
-    .feature-card.bmi-calculator:hover {
+    .feature-card.bmi-calculator:hover,
+    .feature-card.tdee-calculator:hover,
+    .feature-card.bf-calculator:hover {
       transform: none !important;
       border-color: rgba(255, 255, 255, 0.1) !important;
       box-shadow: none !important;
